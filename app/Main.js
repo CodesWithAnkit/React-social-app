@@ -1,16 +1,34 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { BrowserRouter, Switch, Route } from 'react-router-dom'
 
-const SimpleComponent = () => {
+import Header from './components/Header'
+import HomeGuest from './components/HomeGuest'
+import Footer from './components/Footer'
+import About from './components/About'
+import Terms from './components/Terms'
+
+const Main = () => {
   return (
-    <div>
-      <h1>This is our App!!!!!!</h1>
-      <p>Water is life, You can </p>
-    </div>
+    <BrowserRouter>
+      <Header />
+      <Switch>
+        <Route path="/" exact>
+          <HomeGuest />
+        </Route>
+        <Route path="/about-us">
+          <About />
+        </Route>
+        <Route path="/terms">
+          <Terms />
+        </Route>
+      </Switch>
+      <Footer />
+    </BrowserRouter>
   )
 }
 
-ReactDOM.render(<SimpleComponent />, document.getElementById('app'))
+ReactDOM.render(<Main />, document.getElementById('app'))
 
 // This is for auto reload without refresing
 if (module.hot) {
