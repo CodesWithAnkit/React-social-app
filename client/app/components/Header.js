@@ -1,13 +1,9 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Link } from 'react-router-dom'
 import HeaderLogOut from './HeaderLogOut'
 import HeaderLoggedIn from './HeaderLoggedIn'
 
-const Header = () => {
-  const [loggedIn, setLoggedIn] = useState(
-    Boolean(localStorage.getItem('complexappToken'))
-  )
-
+const Header = ({ setLoggedIn, loggedIn }) => {
   return (
     <header className="header-bar bg-primary mb-3">
       <div className="container d-flex flex-column flex-md-row align-items-center p-3">

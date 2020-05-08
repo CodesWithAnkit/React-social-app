@@ -8,7 +8,7 @@ const HeaderLogOut = (props) => {
   async function handleSubmit(e) {
     e.preventDefault()
     try {
-      const response = await axios.post('http://localhost:8080/login', {
+      const response = await axios.post('/login', {
         username,
         password,
       })
