@@ -10,6 +10,7 @@ import Terms from './components/Terms'
 import Home from './components/Home'
 import CreatePost from './components/CreatePost'
 import axios from 'axios'
+import ViewSinglePost from './components/ViewSinglePost'
 axios.defaults.baseURL = 'http://localhost:8080/'
 
 const Main = () => {
@@ -22,6 +23,9 @@ const Main = () => {
       <Switch>
         <Route path="/" exact>
           {loggedIn ? <Home /> : <HomeGuest />}
+        </Route>
+        <Route path="/post/:id">
+          <ViewSinglePost />
         </Route>
         <Route path="/about-us">
           <About />

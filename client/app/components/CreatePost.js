@@ -1,19 +1,21 @@
 import React, { useState } from 'react'
 import Page from './Page'
 import axios from 'axios'
+import { withRouter } from 'react-router-dom'
 
-const CreatePost = () => {
+const CreatePost = ({ history }) => {
   const [title, setTitle] = useState()
   const [body, setBody] = useState()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      await axios.post('/create-post', {
+      const response = await axios.post('/create-post', {
         title,
         body,
         token: localStorage.getItem('complexappToken'),
       })
+      history.push(`/post/${response.data}`)
       console.log('New Post Created')
     } catch (error) {
       console.log('Unaccepted error happen during create post')
@@ -57,4 +59,4 @@ const CreatePost = () => {
   )
 }
 
-export default CreatePost
+export default withRouter(CreatePost)
