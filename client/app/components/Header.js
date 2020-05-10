@@ -12,11 +12,7 @@ const Header = ({ setLoggedIn, loggedIn }) => {
             ComplexApp
           </Link>
         </h4>
-        {loggedIn ? (
-          <HeaderLoggedIn setLoggedIn={setLoggedIn} />
-        ) : (
-          <HeaderLogOut setLoggedIn={setLoggedIn} />
-        )}
+        {loggedIn ? <HeaderLoggedIn /> : <HeaderLogOut />}
       </div>
     </header>
   )

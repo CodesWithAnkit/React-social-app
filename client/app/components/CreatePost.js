@@ -1,11 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, useContext } from 'react'
 import Page from './Page'
 import axios from 'axios'
 import { withRouter } from 'react-router-dom'
+import ExampleContext from '../ExampleContext'
 
 const CreatePost = ({ history }) => {
   const [title, setTitle] = useState()
   const [body, setBody] = useState()
+
+  const { addFlashMessages } = useContext(ExampleContext)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -15,6 +18,7 @@ const CreatePost = ({ history }) => {
         body,
         token: localStorage.getItem('complexappToken'),
       })
+      addFlashMessages('Congrats, you successfully created a post')
       history.push(`/post/${response.data}`)
       console.log('New Post Created')
     } catch (error) {
