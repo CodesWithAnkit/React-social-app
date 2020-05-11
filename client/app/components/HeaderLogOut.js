@@ -1,11 +1,11 @@
 import React, { useState, useContext } from 'react'
 import axios from 'axios'
-import ExampleContext from '../ExampleContext'
+import DispatchContext from '../DispatchContext'
 
 const HeaderLogOut = () => {
   const [username, setUsername] = useState()
   const [password, setPassword] = useState()
-  const { setLoggedIn } = useContext(ExampleContext)
+  const appDispatch = useContext(DispatchContext)
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -19,7 +19,7 @@ const HeaderLogOut = () => {
         localStorage.setItem('complexappToken', response.data.token)
         localStorage.setItem('complexappUsername', response.data.username)
         localStorage.setItem('complexappAvatar', response.data.avatar)
-        setLoggedIn(true)
+        appDispatch({ type: 'login' })
       } else {
         ;('Invalid username / password')
       }
