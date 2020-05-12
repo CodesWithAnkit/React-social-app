@@ -16,6 +16,7 @@ import CreatePost from './components/CreatePost'
 import FlashMessages from './components/FlashMessages'
 import axios from 'axios'
 import ViewSinglePost from './components/ViewSinglePost'
+import Profile from './components/Profile'
 axios.defaults.baseURL = 'http://localhost:8080/'
 
 const Main = () => {
@@ -65,6 +66,9 @@ const Main = () => {
           <FlashMessages messages={state.flashMessages} />
           <Header />
           <Switch>
+            <Route path="/profile/:username">
+              <Profile />
+            </Route>
             <Route path="/" exact>
               {state.loggedIn ? <Home /> : <HomeGuest />}
             </Route>

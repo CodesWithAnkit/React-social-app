@@ -44,7 +44,7 @@ const CreatePost = ({ history }) => {
             className="form-control form-control-lg form-control-title"
             type="text"
             placeholder=""
-            autocomplete="off"
+            autoComplete="off"
             onChange={(e) => setTitle(e.target.value)}
           />
         </div>
