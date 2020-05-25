@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
 import { useParams, Link } from 'react-router-dom'
+import LoadingDotsIcons from './LoadingDotsIcons'
 
 const ProfilePost = () => {
   const { username } = useParams()
@@ -8,9 +9,12 @@ const ProfilePost = () => {
   const [posts, setPosts] = useState([])
 
   useEffect(() => {
+    const ourRequest = axios.CancelToken.source()
     try {
       async function fetchPosts() {
-        const res = await axios.get(`/profile/${username}/posts`)
+        const res = await axios.get(`/profile/${username}/posts`, {
+          cancelToken: ourRequest.token,
+        })
         setPosts(res.data)
         setIsLoading(false)
       }
@@ -18,9 +22,12 @@ const ProfilePost = () => {
     } catch (error) {
       console.log('something wrong happen in ProfilePage')
     }
+    return () => {
+      ourRequest.cancel()
+    }
   }, [])
 
-  if (isLoading) return <h1>Loading......</h1>
+  if (isLoading) return <LoadingDotsIcons />
   return (
     <div className="list-group">
       {posts.map((post) => {

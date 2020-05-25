@@ -13,6 +13,7 @@ module.exports = {
     contentBase: path.join(__dirname, 'app'),
     hot: true,
     historyApiFallback: { index: 'index.html' },
+    host: '0.0.0.0',
   },
   module: {
     rules: [

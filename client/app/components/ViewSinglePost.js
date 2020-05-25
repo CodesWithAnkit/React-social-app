@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react'
 import Page from './Page'
 import axios from 'axios'
 import { useParams, Link } from 'react-router-dom'
+import LoadingDotsIcons from './LoadingDotsIcons'
+import ReactMarkdown from 'react-markdown'
 
 const ViewSinglePost = () => {
   const { id } = useParams()
@@ -9,9 +11,12 @@ const ViewSinglePost = () => {
   const [post, setPost] = useState()
 
   useEffect(() => {
+    const ourRequest = axios.CancelToken.source()
     try {
       async function fetchPost() {
-        const res = await axios.get(`/post/${id}`)
+        const res = await axios.get(`/post/${id}`, {
+          cancelToken: ourRequest.token,
+        })
         setPost(res.data)
         console.log(res.data)
         setIsLoading(false)
@@ -20,12 +25,15 @@ const ViewSinglePost = () => {
     } catch (error) {
       console.log('something wrong happen in ProfilePage')
     }
+    return () => {
+      ourRequest.cancel()
+    }
   }, [])
 
   if (isLoading)
     return (
       <Page title="<...>">
-        <div>Loading...</div>
+        <LoadingDotsIcons />
       </Page>
     )
 
@@ -60,7 +68,20 @@ const ViewSinglePost = () => {
         on {formatedDate}
       </p>
 
-      <div className="body-content">{post.body}</div>
+      <div className="body-content">
+        <ReactMarkdown
+          source={post.body}
+          // allowedTypes={[
+          //   'paragraph',
+          //   'heading',
+          //   'list',
+          //   'listItem',
+          //   'strong',
+          //   'emphasis',
+          // ]}
+          // Allowed Type is not working right now
+        />
+      </div>
     </Page>
   )
 }
