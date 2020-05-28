@@ -17,6 +17,7 @@ import FlashMessages from './components/FlashMessages'
 import axios from 'axios'
 import ViewSinglePost from './components/ViewSinglePost'
 import Profile from './components/Profile'
+import EditPost from './components/EditPost'
 axios.defaults.baseURL = 'http://localhost:8080/'
 
 const Main = () => {
@@ -72,8 +73,11 @@ const Main = () => {
             <Route path="/" exact>
               {state.loggedIn ? <Home /> : <HomeGuest />}
             </Route>
-            <Route path="/post/:id">
+            <Route path="/post/:id" exact>
               <ViewSinglePost />
+            </Route>
+            <Route path="/post/:id/edit" exact>
+              <EditPost />
             </Route>
             <Route path="/about-us">
               <About />
