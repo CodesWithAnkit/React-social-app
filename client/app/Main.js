@@ -1,65 +1,66 @@
-import React, { useReducer, useEffect } from "react";
-import ReactDOM from "react-dom";
-import { useImmerReducer } from "use-immer";
-import { BrowserRouter, Switch, Route } from "react-router-dom";
-// Context module
-import StateContext from "./StateContext";
-import DispatchContext from "./DispatchContext";
+import React, { useState, useReducer, useEffect } from "react"
+import ReactDOM from "react-dom"
+import { useImmerReducer } from "use-immer"
+import { BrowserRouter, Switch, Route } from "react-router-dom"
+import Axios from "axios"
+Axios.defaults.baseURL = "http://localhost:8080"
 
-import Header from "./components/Header";
-import HomeGuest from "./components/HomeGuest";
-import Footer from "./components/Footer";
-import About from "./components/About";
-import Terms from "./components/Terms";
-import Home from "./components/Home";
-import CreatePost from "./components/CreatePost";
-import FlashMessages from "./components/FlashMessages";
-import axios from "axios";
-import ViewSinglePost from "./components/ViewSinglePost";
-import Profile from "./components/Profile";
-import EditPost from "./components/EditPost";
-import NotFound from "./components/NotFound";
-axios.defaults.baseURL = "http://localhost:8080/";
+import StateContext from "./StateContext"
+import DispatchContext from "./DispatchContext"
 
-const Main = () => {
-  const intitalState = {
+// My Components
+import Header from "./components/Header"
+import HomeGuest from "./components/HomeGuest"
+import Home from "./components/Home"
+import Footer from "./components/Footer"
+import About from "./components/About"
+import Terms from "./components/Terms"
+import CreatePost from "./components/CreatePost"
+import ViewSinglePost from "./components/ViewSinglePost"
+import FlashMessages from "./components/FlashMessages"
+import Profile from "./components/Profile"
+import EditPost from "./components/EditPost"
+import NotFound from "./components/NotFound"
+
+function Main() {
+  const initialState = {
     loggedIn: Boolean(localStorage.getItem("complexappToken")),
     flashMessages: [],
     user: {
       token: localStorage.getItem("complexappToken"),
       username: localStorage.getItem("complexappUsername"),
-      Avatar: localStorage.getItem("complexappAvatar"),
-    },
-  };
+      avatar: localStorage.getItem("complexappAvatar")
+    }
+  }
 
-  const ourReducer = (draft, action) => {
+  function ourReducer(draft, action) {
     switch (action.type) {
       case "login":
-        draft.loggedIn = true;
-        draft.user = action.data;
-        return;
+        draft.loggedIn = true
+        draft.user = action.data
+        return
       case "logout":
-        draft.loggedIn = false;
-        return;
+        draft.loggedIn = false
+        return
       case "flashMessage":
-        draft.flashMessages.push(action.value);
-        return;
+        draft.flashMessages.push(action.value)
+        return
     }
-  };
+  }
 
-  const [state, dispatch] = useImmerReducer(ourReducer, intitalState);
+  const [state, dispatch] = useImmerReducer(ourReducer, initialState)
 
   useEffect(() => {
     if (state.loggedIn) {
-      localStorage.setItem("complexappToken", state.user.token);
-      localStorage.setItem("complexappUsername", state.user.username);
-      localStorage.setItem("complexappAvatar", state.user.avatar);
+      localStorage.setItem("complexappToken", state.user.token)
+      localStorage.setItem("complexappUsername", state.user.username)
+      localStorage.setItem("complexappAvatar", state.user.avatar)
     } else {
-      localStorage.removeItem("complexappToken");
-      localStorage.removeItem("complexappUsername");
-      localStorage.removeItem("complexappAvatar");
+      localStorage.removeItem("complexappToken")
+      localStorage.removeItem("complexappUsername")
+      localStorage.removeItem("complexappAvatar")
     }
-  }, [state.loggedIn]);
+  }, [state.loggedIn])
 
   return (
     <StateContext.Provider value={state}>
@@ -80,27 +81,28 @@ const Main = () => {
             <Route path="/post/:id/edit" exact>
               <EditPost />
             </Route>
+            <Route path="/create-post">
+              <CreatePost />
+            </Route>
             <Route path="/about-us">
               <About />
-            </Route>
-            <Route path="/create-post" exact>
-              <CreatePost />
             </Route>
             <Route path="/terms">
               <Terms />
             </Route>
-            <Route><NotFound /></Route>
+            <Route>
+              <NotFound />
+            </Route>
           </Switch>
           <Footer />
         </BrowserRouter>
       </DispatchContext.Provider>
     </StateContext.Provider>
-  );
-};
+  )
+}
 
-ReactDOM.render(<Main />, document.getElementById("app"));
+ReactDOM.render(<Main />, document.querySelector("#app"))
 
-// This is for auto reload without refresing
 if (module.hot) {
-  module.hot.accept();
+  module.hot.accept()
 }

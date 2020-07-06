@@ -1,14 +1,14 @@
-import React, { useContext } from 'react'
-import { Link } from 'react-router-dom'
-import DispatchContext from '../DispatchContext'
-import StateContext from '../StateContext'
+import React, { useEffect, useContext } from "react"
+import { Link } from "react-router-dom"
+import DispatchContext from "../DispatchContext"
+import StateContext from "../StateContext"
 
-const HeaderLoggedIn = () => {
+function HeaderLoggedIn(props) {
   const appDispatch = useContext(DispatchContext)
   const appState = useContext(StateContext)
 
-  const handleLoggedIn = () => {
-    appDispatch({ type: 'logout' })
+  function handleLogout() {
+    appDispatch({ type: "logout" })
   }
 
   return (
@@ -26,7 +26,7 @@ const HeaderLoggedIn = () => {
       <Link className="btn btn-sm btn-success mr-2" to="/create-post">
         Create Post
       </Link>
-      <button onClick={handleLoggedIn} className="btn btn-sm btn-secondary">
+      <button onClick={handleLogout} className="btn btn-sm btn-secondary">
         Sign Out
       </button>
     </div>

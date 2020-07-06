@@ -1,10 +1,10 @@
-import React, { useContext } from 'react'
-import { Link } from 'react-router-dom'
-import HeaderLogOut from './HeaderLogOut'
-import HeaderLoggedIn from './HeaderLoggedIn'
-import StateContext from '../StateContext'
+import React, { useState, useContext } from "react"
+import { Link } from "react-router-dom"
+import HeaderLoggedOut from "./HeaderLoggedOut"
+import HeaderLoggedIn from "./HeaderLoggedIn"
+import StateContext from "../StateContext"
 
-const Header = () => {
+function Header(props) {
   const appState = useContext(StateContext)
 
   return (
@@ -15,7 +15,7 @@ const Header = () => {
             ComplexApp
           </Link>
         </h4>
-        {appState.loggedIn ? <HeaderLoggedIn /> : <HeaderLogOut />}
+        {appState.loggedIn ? <HeaderLoggedIn /> : <HeaderLoggedOut />}
       </div>
     </header>
   )
