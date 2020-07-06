@@ -1,87 +1,105 @@
-import React, { useEffect, useContext } from 'react'
-import { useImmerReducer } from 'use-immer'
-import Page from './Page'
-import axios from 'axios'
-import { useParams, Link } from 'react-router-dom'
-import StateContext from '../StateContext.js'
-import DispatchContext from '../DispatchContext.js'
-import LoadingDotsIcons from './LoadingDotsIcons'
+import React, { useEffect, useContext } from "react";
+import { useImmerReducer } from "use-immer";
+import Page from "./Page";
+import axios from "axios";
+import { useParams, Link } from "react-router-dom";
+import StateContext from "../StateContext.js";
+import DispatchContext from "../DispatchContext.js";
+import LoadingDotsIcons from "./LoadingDotsIcons";
 
 const ViewSinglePost = () => {
-  const appState = useContext(StateContext)
-  const appDispatch = useContext(DispatchContext)
+  const appState = useContext(StateContext);
+  const appDispatch = useContext(DispatchContext);
   const originalState = {
     title: {
-      value: '',
+      value: "",
       hasError: false,
-      body: '',
+      body: "",
     },
     body: {
-      value: '',
+      value: "",
       hasError: false,
-      body: '',
+      body: "",
     },
     isFetching: true,
     isSaving: false,
     id: useParams().id,
     sendCount: 0,
-  }
+  };
   const ourReducer = (draft, action) => {
     switch (action.type) {
-      case 'fetchComplete':
-        draft.title.value = action.value.title
-        draft.body.value = action.value.body
-        draft.isFetching = false
-        return
-      case 'titleChange':
-        draft.title.value = action.value
-        return
-      case 'bodyChange':
-        draft.body.value = action.value
-        return
-      case 'submitRequest':
-        draft.sendCount++
-        return
-      case 'saveRequestStarted':
-        draft.isSaving = true
-        return
-      case 'saveRequestFinised':
-        draft.isSaving = false
-        return
+      case "fetchComplete":
+        draft.title.value = action.value.title;
+        draft.body.value = action.value.body;
+        draft.isFetching = false;
+        return;
+      case "titleChange":
+        draft.title.hasError = false;
+        draft.title.value = action.value;
+        return;
+      case "bodyChange":
+        draft.body.hasError = false;
+        draft.body.value = action.value;
+        return;
+      case "submitRequest":
+        if (!draft.title.hasError && !draft.body.hasError) {
+          draft.sendCount++;
+        }
+        return;
+      case "saveRequestStarted":
+        draft.isSaving = true;
+        return;
+      case "saveRequestFinised":
+        draft.isSaving = false;
+        return;
+      case "titleRules":
+        if (!action.value.trim()) {
+          draft.title.hasError = true;
+          draft.title.message = "You  must provide a title.";
+        }
+        return;
+      case "bodyRules":
+        if (!action.value.trim()) {
+          draft.body.hasError = true;
+          draft.body.message = "You must provide body content";
+        }
+        return;
     }
-  }
+  };
 
-  const [state, dispatch] = useImmerReducer(ourReducer, originalState)
+  const [state, dispatch] = useImmerReducer(ourReducer, originalState);
 
   const submitHandler = (e) => {
-    e.preventDefault()
-    dispatch({ type: 'submitRequest' })
-  }
+    e.preventDefault();
+    dispatch({ type: "titleRules", value: state.title.value });
+    dispatch({ type: "bodyRules", value: state.body.value });
+    dispatch({ type: "submitRequest" });
+  };
 
   // Get request for the post
   useEffect(() => {
-    const ourRequest = axios.CancelToken.source()
+    const ourRequest = axios.CancelToken.source();
     try {
       async function fetchPost() {
         const res = await axios.get(`/post/${state.id}`, {
           cancelToken: ourRequest.token,
-        })
-        dispatch({ type: 'fetchComplete', value: res.data })
+        });
+        dispatch({ type: "fetchComplete", value: res.data });
       }
-      fetchPost()
+      fetchPost();
     } catch (error) {
-      console.log('something wrong happen in ProfilePage')
+      console.log("something wrong happen in ProfilePage");
     }
     return () => {
-      ourRequest.cancel()
-    }
-  }, [])
+      ourRequest.cancel();
+    };
+  }, []);
 
   // Post request after saving
   useEffect(() => {
     if (state.sendCount) {
-      dispatch({ type: 'saveRequestStarted' })
-      const ourRequest = axios.CancelToken.source()
+      dispatch({ type: "saveRequestStarted" });
+      const ourRequest = axios.CancelToken.source();
       try {
         async function fetchPost() {
           const res = await axios.post(
@@ -93,31 +111,35 @@ const ViewSinglePost = () => {
             },
             {
               cancelToken: ourRequest.token,
-            }
-          )
-          dispatch({ type: 'saveRequestFinised' })
-          appDispatch({ type: 'flashMessage', value: 'Post Updated' })
+            },
+          );
+          dispatch({ type: "saveRequestFinised" });
+          appDispatch({ type: "flashMessage", value: "Post Updated" });
         }
-        fetchPost()
+        fetchPost();
       } catch (error) {
-        console.log('something wrong happen in ProfilePage')
+        console.log("something wrong happen in ProfilePage");
       }
       return () => {
-        ourRequest.cancel()
-      }
+        ourRequest.cancel();
+      };
     }
-  }, [state.sendCount])
+  }, [state.sendCount]);
 
-  if (state.isFetching)
+  if (state.isFetching) {
     return (
       <Page title="<...>">
         <LoadingDotsIcons />
       </Page>
-    )
+    );
+  }
 
   return (
     <Page title="Edit Post">
-      <form onSubmit={submitHandler}>
+      <Link className="font-weight-bold small" to={`/post/${state.id}`}>
+        &laquo; Back to post permalink
+      </Link>
+      <form className="mt-3" onSubmit={submitHandler}>
         <div className="form-group">
           <label htmlFor="post-title" className="text-muted mb-1">
             <small>Title</small>
@@ -131,10 +153,15 @@ const ViewSinglePost = () => {
             placeholder=""
             autoComplete="off"
             value={state.title.value}
+            onBlur={(e) =>
+              dispatch({ type: "titleRules", value: e.target.value })}
             onChange={(e) =>
-              dispatch({ type: 'titleChange', value: e.target.value })
-            }
+              dispatch({ type: "titleChange", value: e.target.value })}
           />
+          {state.title.hasError &&
+            <div className="alert alert-danger small liveValidateMessage">
+              {state.title.message}
+            </div>}
         </div>
 
         <div className="form-group">
@@ -147,18 +174,23 @@ const ViewSinglePost = () => {
             className="body-content tall-textarea form-control"
             type="text"
             value={state.body.value}
+            onBlur={(e) =>
+              dispatch({ type: "bodyRules", value: e.target.value })}
             onChange={(e) =>
-              dispatch({ type: 'bodyChange', value: e.target.value })
-            }
+              dispatch({ type: "bodyChange", value: e.target.value })}
           />
+          {state.body.hasError &&
+            <div className="alert alert-danger small liveValidateMessage">
+              {state.body.message}
+            </div>}
         </div>
 
         <button className="btn btn-primary" disabled={state.isSaving}>
-          {state.isSaving ? 'Saving...' : 'Save Post'}
+          {state.isSaving ? "Saving..." : "Save Post"}
         </button>
       </form>
     </Page>
-  )
-}
+  );
+};
 
-export default ViewSinglePost
+export default ViewSinglePost;
