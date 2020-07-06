@@ -1,48 +1,53 @@
-import React, { useState, useEffect } from 'react'
-import Page from './Page'
-import axios from 'axios'
-import { useParams, Link } from 'react-router-dom'
-import LoadingDotsIcons from './LoadingDotsIcons'
-import ReactMarkdown from 'react-markdown'
-import ReactTooltip from 'react-tooltip'
+import React, { useState, useEffect } from "react";
+import Page from "./Page";
+import axios from "axios";
+import { useParams, Link } from "react-router-dom";
+import LoadingDotsIcons from "./LoadingDotsIcons";
+import ReactMarkdown from "react-markdown";
+import ReactTooltip from "react-tooltip";
+import NotFound from "./NotFound";
 
 const ViewSinglePost = () => {
-  const { id } = useParams()
-  const [isLoading, setIsLoading] = useState(true)
-  const [post, setPost] = useState()
+  const { id } = useParams();
+  const [isLoading, setIsLoading] = useState(true);
+  const [post, setPost] = useState();
 
   useEffect(() => {
-    const ourRequest = axios.CancelToken.source()
+    const ourRequest = axios.CancelToken.source();
     try {
       async function fetchPost() {
         const res = await axios.get(`/post/${id}`, {
           cancelToken: ourRequest.token,
-        })
-        setPost(res.data)
-        console.log(res.data)
-        setIsLoading(false)
+        });
+        setPost(res.data);
+        console.log(res.data);
+        setIsLoading(false);
       }
-      fetchPost()
+      fetchPost();
     } catch (error) {
-      console.log('something wrong happen in ProfilePage')
+      console.log("something wrong happen in ProfilePage");
     }
     return () => {
-      ourRequest.cancel()
-    }
-  }, [])
+      ourRequest.cancel();
+    };
+  }, []);
 
-  if (isLoading)
+  if (!isLoading && !post) {
+    return <NotFound />;
+  }
+
+  if (isLoading) {
     return (
       <Page title="<...>">
         <LoadingDotsIcons />
       </Page>
-    )
+    );
+  }
 
   // // Date formated
-  const date = new Date(post.createdDate)
-  const formatedDate = `${
-    date.getMonth() + 1
-  }/${date.getDay()}/${date.getFullYear()}`
+  const date = new Date(post.createdDate);
+  const formatedDate = `${date.getMonth() +
+    1}/${date.getDay()}/${date.getFullYear()}`;
 
   return (
     <Page title={post.title}>
@@ -57,7 +62,8 @@ const ViewSinglePost = () => {
           >
             <i className="fas fa-edit"></i>
           </Link>
-          <ReactTooltip id="edit" className="custom-tooltip" />{' '}
+          <ReactTooltip id="edit" className="custom-tooltip" />
+          {" "}
           <a
             className="delete-post-button text-danger"
             data-tip="Delete"
@@ -83,19 +89,10 @@ const ViewSinglePost = () => {
       <div className="body-content">
         <ReactMarkdown
           source={post.body}
-          // allowedTypes={[
-          //   'paragraph',
-          //   'heading',
-          //   'list',
-          //   'listItem',
-          //   'strong',
-          //   'emphasis',
-          // ]}
-          // Allowed Type is not working right now
         />
       </div>
     </Page>
-  )
-}
+  );
+};
 
-export default ViewSinglePost
+export default ViewSinglePost;

@@ -2,12 +2,13 @@ import React, { useEffect, useContext } from "react";
 import { useImmerReducer } from "use-immer";
 import Page from "./Page";
 import axios from "axios";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, withRouter } from "react-router-dom";
 import StateContext from "../StateContext.js";
 import DispatchContext from "../DispatchContext.js";
 import LoadingDotsIcons from "./LoadingDotsIcons";
+import NotFound from "./NotFound";
 
-const ViewSinglePost = () => {
+const EditPost = (props) => {
   const appState = useContext(StateContext);
   const appDispatch = useContext(DispatchContext);
   const originalState = {
@@ -25,6 +26,7 @@ const ViewSinglePost = () => {
     isSaving: false,
     id: useParams().id,
     sendCount: 0,
+    notFound: false,
   };
   const ourReducer = (draft, action) => {
     switch (action.type) {
@@ -64,6 +66,9 @@ const ViewSinglePost = () => {
           draft.body.message = "You must provide body content";
         }
         return;
+      case "notFound":
+        draft.notFound = true;
+        return;
     }
   };
 
@@ -84,8 +89,24 @@ const ViewSinglePost = () => {
         const res = await axios.get(`/post/${state.id}`, {
           cancelToken: ourRequest.token,
         });
-        dispatch({ type: "fetchComplete", value: res.data });
+        if (res.data) {
+          dispatch({ type: "fetchComplete", value: res.data });
+
+          if (appState.user.username != res.data.author.username) {
+            appDispatch(
+              {
+                type: "flashMessage",
+                value: "You don't have premission to edit other post",
+              },
+            );
+            // Redirect to homepage
+            props.history.push("/");
+          }
+        } else {
+          dispatch({ type: "notFound" });
+        }
       }
+
       fetchPost();
     } catch (error) {
       console.log("something wrong happen in ProfilePage");
@@ -125,6 +146,12 @@ const ViewSinglePost = () => {
       };
     }
   }, [state.sendCount]);
+
+  if (state.notFound) {
+    return (
+      <NotFound />
+    );
+  }
 
   if (state.isFetching) {
     return (
@@ -193,4 +220,4 @@ const ViewSinglePost = () => {
   );
 };
 
-export default ViewSinglePost;
+export default withRouter(EditPost);
